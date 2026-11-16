@@ -1,0 +1,156 @@
+{
+  "project_name": "PATY INVESTIGA",
+  "app_type": "Hybrid Fullstack News Portal & Media Hub",
+  "city": "Angra dos Reis (RJ, Brazil)",
+  "language": "pt-BR",
+  "archetype": "ARCHETYPE 6: VIBRANT PLAY & ELECTRIC INVESTIGATIVE (Tropical Sunny + Investigative Yellow/Cyan/Deep Blue)",
+  "design_philosophy": {
+    "core_concept": "Modern, energetic, eye-catching investigative news portal for Angra dos Reis. Fuses tropical Brazilian coastal vibrant tones (sunburst yellow, ocean cyan, electric magenta accents, deep midnight navy) with a crisp detective magnifying glass branding badge.",
+    "anti_patterns_avoided": [
+      "No boring dull gray news site template",
+      "No default Inter typography for headlines (uses Outfit + Plus Jakarta Sans + Space Grotesk accents for JS components)",
+      "No flat transparent headers without blur backdrop",
+      "No standard square identical grid - uses Tetris Bento grid for news and Instagram/TikTok styled reels player"
+    ]
+  },
+  "logo_branding": {
+    "name": "PATY INVESTIGA",
+    "icon": "Detective Magnifying Glass with glowing lens effect and search pulse ring",
+    "badge_style": "Vibrant Sun Yellow (#FFC72C) & Electric Teal/Cyan (#00E5FF) with crisp Dark Navy typography, rounded badge container with subtle shadow and magnifying lens overlay on the 'P' or preceding icon",
+    "tagline": "A verdade por trás dos fatos em Angra dos Reis e Região Costa Verde"
+  },
+  "color_system": {
+    "palette": {
+      "primary_brand": "#FFB800",
+      "primary_brand_hover": "#E6A600",
+      "secondary_accent": "#00C2FF",
+      "magenta_highlight": "#FF2A7A",
+      "deep_navy_bg": "#0B132B",
+      "card_surface_light": "#FFFFFF",
+      "card_surface_dark": "#1C2541",
+      "border_light": "rgba(226, 232, 240, 0.8)",
+      "border_dark": "rgba(255, 255, 255, 0.12)",
+      "tropical_emerald": "#00D18F"
+    },
+    "gradients": {
+      "hero_badge": "linear-gradient(135deg, #FFD000 0%, #FF2A7A 100%)",
+      "reels_card": "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(11, 19, 43, 0.95) 100%)",
+      "investigation_glow": "radial-gradient(circle, rgba(0, 194, 255, 0.15) 0%, rgba(0,0,0,0) 70%)"
+    }
+  },
+  "typography": {
+    "font_family_heading": "'Outfit', 'Cabinet Grotesk', sans-serif",
+    "font_family_body": "'Plus Jakarta Sans', sans-serif",
+    "font_family_mono": "'JetBrains Mono', monospace",
+    "heading_rules": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 dark:text-white",
+      "h3": "text-xl sm:text-2xl font-bold text-slate-900 dark:text-white",
+      "h4": "text-lg sm:text-xl font-semibold text-slate-800 dark:text-slate-100"
+    }
+  },
+  "layout_and_bento": {
+    "header": {
+      "style": "Sticky top-0 z-50 backdrop-blur-xl bg-white/85 dark:bg-slate-900/85 border-b border-slate-200 dark:border-slate-800 shadow-sm",
+      "elements": [
+        "Brand Logo (Detective Magnifying Glass + PATY INVESTIGA text)",
+        "Navigation Links: início (Home), Notícias, Entrevistas, Vídeos, Reels, Colunas Sociais",
+        "Search bar with live filtering",
+        "Admin Portal quick entrance button with badge indicator",
+        "Theme mode toggle (Light/Dark)"
+      ]
+    },
+    "home_bento_grid": {
+      "mode": "MODE A: TETRIS GRID for News Portal",
+      "structure": "grid-cols-1 md:grid-cols-12 gap-6",
+      "spans": {
+        "hero_investigation": "col-span-full lg:col-span-7 row-span-2 (Main breaking investigation news with big hero image, category pill, author badge, like count, quick share)",
+        "featured_video": "col-span-full md:col-span-6 lg:col-span-5 (Matéria em vídeo highlight with playable embedded video player)",
+        "columnist_spotlight": "col-span-full md:col-span-6 lg:col-span-5 (Coluna Social by Paty with avatar, quote snippet, comment counter)",
+        "trending_reels": "col-span-full row-span-1 (Horizontal scrolling reels tray with play count, vertical video preview, double tap like)"
+      }
+    }
+  },
+  "pages_and_features": {
+    "1_home": {
+      "title": "Início - Portal Paty Investiga",
+      "description": "Feed principal de notícias com plantão de Angra dos Reis, últimas notícias de política, meio ambiente, turismo, segurança e utilidade pública."
+    },
+    "2_entrevistas": {
+      "title": "Entrevistas Exclusivas",
+      "description": "Sessão dedicada a entrevistas em vídeo e áudio/texto com autoridades locais, personalidades de Angra dos Reis, artistas e moradores."
+    },
+    "3_materias_video": {
+      "title": "Matérias em Vídeo",
+      "description": "Reportagens investigativas completas com players de mídia integrados (suporte a YouTube, Instagram Embed e upload de vídeo direto)."
+    },
+    "4_reels": {
+      "title": "Vídeos Rápidos (Reels)",
+      "description": "Player estilo TikTok/Instagram Reels na vertical com transição swipe/navegação por setas, curtir instantâneo, comentários em gaveta flutuante e compartilhamento WhatsApp/Redes."
+    },
+    "5_colunas_sociais": {
+      "title": "Colunas Sociais",
+      "description": "Espaço autoral de Paty cobrindo eventos sociais, festas, bailes, turismo de Angra dos Reis, negócios locais e bastidores da cidade."
+    },
+    "6_post_detail": {
+      "title": "Página Detalhada do Post",
+      "description": "Exibição completa do artigo/vídeo com leitor de matérias, botão de Like interativo (+1 animação), botão de Compartilhar (copiar link, WhatsApp, Facebook, X), e seção de comentários onde leitores comentam informando APENAS o nome e o comentário."
+    },
+    "7_admin_dashboard": {
+      "title": "Painel do Administrador",
+      "description": "Área restrita de login para Paty/Admin publicar novas matérias, editar ou excluir posts existentes, gerenciar categorias, adicionar mídias via upload ou links (YouTube/Instagram) e moderar/aprovar comentários dos leitores."
+    }
+  },
+  "interactive_components": {
+    "like_button": "Heart animation with confetti scale state, instant persistent counter update",
+    "share_modal": "Popover with 1-click WhatsApp share link, Direct URL copy, and social network buttons",
+    "comments_section": "Name-only input form (sem necessidade de e-mail/senha) + text area, real-time submission with instantly updating comment stream",
+    "reels_viewer": "Vertical snap scrolling with side action bar (Heart like, Comment drawer button, Share, Sound toggle)",
+    "admin_manager": "Post creation modal with title, slug, category select, type select (Notícia, Entrevistas, Vídeo, Reels, Coluna Social), image URL/upload, video YouTube embed link, rich text body editor, and published status switch."
+  },
+  "image_urls": {
+    "angra_hero_ocean": "https://images.pexels.com/photos/20235073/pexels-photo-20235073.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "angra_beach_boats": "https://images.unsplash.com/photo-1664249501164-bde219efca11?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxBbmdyYSUyMGRvcyUyMFJlaXMlMjBiZWFjaCUyMGJyYXppbHxlbnwwfHx8fDE3ODQ3Njc2ODd8MA&ixlib=rb-4.1.0&q=85",
+    "brazil_flag_beach": "https://images.unsplash.com/photo-1780388880896-db363cdc61be?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHw0fHxBbmdyYSUyMGRvcyUyMFJlaXMlMjBiZWFjaCUyMGJyYXppbHxlbnwwfHx8fDE3ODQ3Njc2ODd8MA&ixlib=rb-4.1.0&q=85",
+    "journalist_interview_studio": "https://images.unsplash.com/photo-1664277497087-51787d2b9d15",
+    "female_interviewer_mic": "https://images.unsplash.com/photo-1554200876-980213841c94",
+    "detective_magnifying_glass": "https://images.unsplash.com/photo-1768839722142-a980c55e994b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwxfHxkZXRlY3RpdmUlMjBtYWduaWZ5aW5nJTIwZ2xhc3MlMjBpbnZlc3RpZ2F0aXZlJTIwam91cm5hbGlzbSUyMGNvbG9yZnVsJTIwdmlicmFudHxlbnwwfHx8fDE3OTI5NDc0MTh8MA&ixlib=rb-4.1.0&q=85",
+    "investigative_woman_magnifier": "https://images.unsplash.com/photo-1768839721041-437940836abb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxkZXRlY3RpdmUlMjBtYWduaWZ5aW5nJTIwZ2xhc3MlMjBpbnZlc3RpZ2F0aXZlJTIwam91cm5hbGlzbSUyMGNvbG9yZnVsJTIwdmlicmFudHxlbnwwfHx8fDE3OTI5NDc0MTh8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "testing_guidelines": {
+    "data_testid_convention": "kebab-case mandatory attributes on all interactive elements",
+    "required_test_ids": [
+      "navbar-brand-logo",
+      "nav-link-home",
+      "nav-link-noticias",
+      "nav-link-entrevistas",
+      "nav-link-materias-video",
+      "nav-link-reels",
+      "nav-link-colunas-sociais",
+      "nav-link-admin",
+      "like-button-post-{id}",
+      "share-button-post-{id}",
+      "comment-input-name",
+      "comment-input-content",
+      "comment-submit-button",
+      "admin-login-email-input",
+      "admin-login-password-input",
+      "admin-login-submit-button",
+      "admin-add-post-button",
+      "admin-post-title-input",
+      "admin-post-category-select",
+      "admin-post-media-url-input",
+      "admin-post-save-button",
+      "reels-next-button",
+      "reels-prev-button"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure the code is clean JavaScript React (.js files).",
+    "Make sure the UI is completely in Portuguese as requested by the user.",
+    "Logo MUST incorporate a prominent detective magnifying glass with vibrant yellow/cyan accents and 'PATY INVESTIGA' wording.",
+    "Implement real mock initial posts for Angra dos Reis covering News, Interviews, Video stories, Social Columns, and Reels.",
+    "Ensure readers can comment by typing ONLY their name and comment text (no mandatory email/password sign-up for readers).",
+    "Admin section must allow login (e.g., admin / admin123 or configurable) to add, edit, delete posts, and manage media upload links."
+  ]
+}
