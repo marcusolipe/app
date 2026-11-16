@@ -118,7 +118,7 @@ def get_object(path: str):
 
 
 # ---------- Models ----------
-PostType = Literal["noticia", "entrevista", "video", "reel", "coluna"]
+PostType = Literal["noticia", "entrevista", "video", "reel", "coluna", "evento"]
 
 
 def now_iso():
@@ -136,6 +136,9 @@ class PostIn(BaseModel):
     video_url: str = ""
     published: bool = True
     featured: bool = False
+    event_date: str = Field("", pattern=r"^(\d{4}-\d{2}-\d{2})?$")
+    event_time: str = ""
+    location: str = ""
 
 
 class Post(PostIn):
@@ -173,13 +176,17 @@ async def root():
 
 
 @api_router.get("/posts", response_model=List[Post])
-async def list_posts(type: Optional[PostType] = None, q: Optional[str] = None, limit: int = Query(50, ge=1, le=200)):
+async def list_posts(type: Optional[PostType] = None, q: Optional[str] = None, upcoming: bool = False,
+                     limit: int = Query(50, ge=1, le=200)):
     query = {"published": True}
     if type:
         query["type"] = type
     if q:
         query["title"] = {"$regex": re.escape(q), "$options": "i"}
-    docs = await db.posts.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
+    if upcoming:
+        query["event_date"] = {"$gte": datetime.now(timezone.utc).date().isoformat()}
+    sort = ("event_date", 1) if type == "evento" else ("created_at", -1)
+    docs = await db.posts.find(query, {"_id": 0}).sort(*sort).to_list(limit)
     return [Post(**d) for d in docs]
 
 
@@ -370,12 +377,33 @@ SEED = [
 ]
 
 
+def _event_seed():
+    from datetime import timedelta
+    d = lambda n: (datetime.now(timezone.utc).date() + timedelta(days=n)).isoformat()
+    return [
+        dict(type="evento", category="Música", cover_url=IMG["ocean"], event_date=d(3), event_time="20:00", location="Praça do Porto, Centro",
+             title="Show de forró pé-de-serra na Praça do Porto", summary="Noite de forró gratuito com bandas da Costa Verde.",
+             content="Prepare o pé! A Praça do Porto recebe uma noite inteira de forró pé-de-serra com entrada gratuita."),
+        dict(type="evento", category="Festa", cover_url=IMG["flag"], event_date=d(8), event_time="16:00", location="Praia do Anil",
+             title="Luau da Praia do Anil", summary="Música ao vivo, comidinhas e fogueira à beira-mar.",
+             content="O tradicional luau volta com voz e violão, barracas de comidinhas e muita gente bonita."),
+        dict(type="evento", category="Esporte", cover_url=IMG["boats"], event_date=d(15), event_time="09:00", location="Marina do Frade",
+             title="Regata da Baía da Ilha Grande", summary="Veleiros de todo o estado disputam o troféu na baía.",
+             content="A regata reúne velejadores de todo o Rio de Janeiro. O público pode acompanhar da orla."),
+        dict(type="evento", category="Cultura", cover_url=IMG["studio"], event_date=d(22), event_time="19:00", location="Centro Cultural Theatro Municipal",
+             title="Mostra de cinema caiçara", summary="Curtas produzidos por cineastas da região.",
+             content="Uma semana de exibições gratuitas e bate-papos com diretores locais."),
+    ]
+
+
 @app.on_event("startup")
 async def startup():
     for old, new in RETIRED_ROLES.items():
         await db.users.update_many({"role": old}, {"$set": {"role": new}})
     if await db.posts.count_documents({}) == 0:
         await db.posts.insert_many([Post(**s).model_dump() for s in SEED])
+    if await db.posts.count_documents({"type": "evento"}) == 0:
+        await db.posts.insert_many([Post(**s).model_dump() for s in _event_seed()])
     try:
         init_storage()
         logger.info("Storage initialized")

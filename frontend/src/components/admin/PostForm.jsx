@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { http, TYPES, mediaUrl } from "@/lib/api";
 import { useAuthed } from "@/pages/Admin";
 
-const EMPTY = { type: "noticia", title: "", summary: "", content: "", category: "", author: "Paty", cover_url: "", video_url: "", published: true, featured: false };
+const EMPTY = { type: "noticia", title: "", summary: "", content: "", category: "", author: "Paty", cover_url: "", video_url: "", published: true, featured: false, event_date: "", event_time: "", location: "" };
 const inputCls = "w-full rounded-xl bg-[#FFFBF2] border border-[#0B132B]/15 px-4 py-2.5 outline-none focus:border-[#FF2A7A]";
 
 const MediaField = ({ label, value, onChange, accept, testid }) => {
@@ -56,6 +56,7 @@ export default function PostForm({ post, onClose, onSaved }) {
   const save = async (e) => {
     e.preventDefault();
     if (!f.title.trim()) return toast.error("Informe o título");
+    if (f.type === "evento" && !f.event_date) return toast.error("Informe a data do evento");
     setSaving(true);
     const body = Object.fromEntries(Object.keys(EMPTY).map((k) => [k, f[k]]));
     try {
@@ -103,6 +104,22 @@ export default function PostForm({ post, onClose, onSaved }) {
             <label className="text-sm font-bold">Texto (separe parágrafos com uma linha em branco)</label>
             <textarea data-testid="admin-post-content-input" rows={8} value={f.content} onChange={(e) => set("content")(e.target.value)} className={`mt-1 ${inputCls}`} />
           </div>
+          {f.type === "evento" && (
+            <div className="grid sm:grid-cols-3 gap-4 rounded-2xl bg-[#FF7A00]/10 p-4" data-testid="admin-event-fields">
+              <div>
+                <label className="text-sm font-bold">Data do evento</label>
+                <input type="date" data-testid="admin-event-date-input" value={f.event_date} onChange={(e) => set("event_date")(e.target.value)} className={`mt-1 ${inputCls}`} />
+              </div>
+              <div>
+                <label className="text-sm font-bold">Horário</label>
+                <input type="time" data-testid="admin-event-time-input" value={f.event_time} onChange={(e) => set("event_time")(e.target.value)} className={`mt-1 ${inputCls}`} />
+              </div>
+              <div>
+                <label className="text-sm font-bold">Local</label>
+                <input data-testid="admin-event-location-input" value={f.location} onChange={(e) => set("location")(e.target.value)} placeholder="Ex.: Praça do Porto" className={`mt-1 ${inputCls}`} />
+              </div>
+            </div>
+          )}
           <MediaField label="Imagem de capa" value={f.cover_url} onChange={set("cover_url")} accept="image/*" testid="admin-post-cover" />
           <MediaField label={isMedia ? "Vídeo (YouTube, Instagram ou arquivo)" : "Vídeo (opcional)"} value={f.video_url} onChange={set("video_url")} accept="video/*" testid="admin-post-media-url" />
           <div className="grid sm:grid-cols-3 gap-4 items-center">

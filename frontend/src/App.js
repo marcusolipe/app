@@ -10,6 +10,7 @@ import SectionPage from "@/pages/SectionPage";
 import PostDetail from "@/pages/PostDetail";
 import Reels from "@/pages/Reels";
 import Admin from "@/pages/Admin";
+import Agenda from "@/pages/Agenda";
 
 const AuthWrap = ({ children }) => (
   <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">{children}</div>
@@ -29,6 +30,7 @@ function App() {
               <Route path="/videos" element={<SectionPage type="video" />} />
               <Route path="/colunas" element={<SectionPage type="coluna" />} />
               <Route path="/reels" element={<Reels />} />
+              <Route path="/agenda" element={<Agenda />} />
               <Route path="/post/:id" element={<PostDetail />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/sign-in/*" element={<AuthWrap><SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" withSignUp fallbackRedirectUrl="/admin" /></AuthWrap>} />

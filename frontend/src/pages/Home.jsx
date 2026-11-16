@@ -3,6 +3,28 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 import { http, TYPES, mediaUrl, postLink } from "@/lib/api";
 import PostCard, { TypePill, Stats } from "@/components/PostCard";
+import EventCard from "@/components/EventCard";
+
+const UpcomingEvents = () => {
+  const [events, setEvents] = useState([]);
+  useEffect(() => {
+    http.get("/posts", { params: { type: "evento", upcoming: true, limit: 4 } }).then((r) => setEvents(r.data)).catch(() => {});
+  }, []);
+  if (!events.length) return null;
+  return (
+    <section className="mt-20" data-testid="home-upcoming-events">
+      <div className="flex items-end justify-between gap-4 mb-7">
+        <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight">Próximos <span className="text-[#FF7A00]">eventos</span></h2>
+        <Link to="/agenda" className="inline-flex items-center gap-1 font-bold text-[#FF2A7A] hover:gap-2 transition-[gap]" data-testid="home-see-all-agenda">
+          Ver agenda <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2">
+        {events.map((e, i) => <EventCard key={e.id} event={e} index={i} />)}
+      </div>
+    </section>
+  );
+};
 
 const Hero = ({ post }) => (
   <Link to={postLink(post)} data-testid="home-hero-post"
@@ -64,8 +86,9 @@ export default function Home() {
   if (!posts) return <div className="max-w-7xl mx-auto px-6 py-24 text-center font-display text-xl" data-testid="home-loading">Investigando as novidades...</div>;
 
   const by = (t) => posts.filter((p) => p.type === t);
-  const hero = posts.find((p) => p.featured && p.type !== "reel") || posts.find((p) => p.type !== "reel");
-  const side = posts.filter((p) => p.id !== hero?.id && p.type !== "reel").slice(0, 2);
+  const main = posts.filter((p) => !["reel", "evento"].includes(p.type));
+  const hero = main.find((p) => p.featured) || main[0];
+  const side = main.filter((p) => p.id !== hero?.id).slice(0, 2);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -91,6 +114,7 @@ export default function Home() {
       )}
 
       <SectionRow type="noticia" posts={by("noticia").filter((p) => p.id !== hero?.id)} />
+      <UpcomingEvents />
       <ReelsTray reels={by("reel")} />
       <SectionRow type="entrevista" posts={by("entrevista")} />
       <SectionRow type="video" posts={by("video")} />

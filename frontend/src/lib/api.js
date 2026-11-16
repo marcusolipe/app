@@ -10,7 +10,15 @@ export const TYPES = {
   video: { label: "Matéria em vídeo", plural: "Matérias em Vídeo", path: "/videos", color: "bg-[#FF2A7A] text-white" },
   reel: { label: "Reels", plural: "Reels", path: "/reels", color: "bg-[#00D18F] text-[#0B132B]" },
   coluna: { label: "Coluna Social", plural: "Colunas Sociais", path: "/colunas", color: "bg-[#0B132B] text-[#FFB800]" },
+  evento: { label: "Evento", plural: "Agenda de Eventos", path: "/agenda", color: "bg-[#FF7A00] text-white" },
 };
+
+export const parseDay = (s) => {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+export const dayKey = (dt) =>
+  `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
 
 export const mediaUrl = (u) => (u && u.startsWith("/api/") ? `${BACKEND_URL}${u}` : u);
 

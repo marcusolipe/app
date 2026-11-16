@@ -21,6 +21,7 @@ export default function Footer() {
           <Link to="/videos" className="hover:text-[#00C2FF]">Matérias em Vídeo</Link>
           <Link to="/reels" className="hover:text-[#00C2FF]">Reels</Link>
           <Link to="/colunas" className="hover:text-[#00C2FF]">Colunas Sociais</Link>
+          <Link to="/agenda" className="hover:text-[#00C2FF]">Agenda de Eventos</Link>
         </div>
         <div className="text-white/70">
           <span className="font-display font-bold text-[#FFB800]">Tem uma pauta?</span>

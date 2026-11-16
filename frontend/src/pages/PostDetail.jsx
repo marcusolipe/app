@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, User } from "lucide-react";
+import { ArrowLeft, Calendar, User, MapPin, Clock } from "lucide-react";
+import { DateBlock } from "@/components/EventCard";
 import { http, TYPES, mediaUrl, formatDate } from "@/lib/api";
 import { TypePill } from "@/components/PostCard";
 import MediaPlayer from "@/components/MediaPlayer";
@@ -38,6 +39,17 @@ export default function PostDetail() {
         <span className="flex items-center gap-1.5"><User className="w-4 h-4" /> {post.author}</span>
         <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {formatDate(post.created_at)}</span>
       </div>
+
+      {post.type === "evento" && post.event_date && (
+        <div className="mt-8 flex items-center gap-5 rounded-3xl bg-white border-2 border-[#0B132B] p-4 shadow-[5px_5px_0_#FF7A00]" data-testid="event-info">
+          <DateBlock date={post.event_date} />
+          <div className="flex flex-col gap-1.5 font-semibold">
+            <span className="first-letter:uppercase">{new Date(post.event_date + "T12:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+            {post.event_time && <span className="flex items-center gap-2 text-sm text-[#0B132B]/70"><Clock className="w-4 h-4 text-[#FF2A7A]" />{post.event_time}</span>}
+            {post.location && <span className="flex items-center gap-2 text-sm text-[#0B132B]/70"><MapPin className="w-4 h-4 text-[#FF2A7A]" />{post.location}</span>}
+          </div>
+        </div>
+      )}
 
       <div className="mt-8 rounded-[2rem] overflow-hidden border-2 border-[#0B132B] shadow-[8px_8px_0_#FFB800] bg-black">
         {post.video_url ? (

@@ -12,6 +12,7 @@ const LINKS = [
   { to: "/videos", label: "Vídeos", id: "materias-video" },
   { to: "/reels", label: "Reels", id: "reels" },
   { to: "/colunas", label: "Colunas Sociais", id: "colunas-sociais" },
+  { to: "/agenda", label: "Agenda", id: "agenda" },
 ];
 
 const linkCls = ({ isActive }) =>
