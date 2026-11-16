@@ -18,6 +18,8 @@ FastAPI + MongoDB (posts, comments, users, files) + React (Tailwind, shadcn). Cl
 - Painel admin: CRUD de postagens (upload ou link), moderação de comentários, gestão de usuários/papéis
 - Logo gerada (lupa + nome), seed com 9 postagens de exemplo
 
+- Agenda de Eventos (tipo 'evento' com data/hora/local): página /agenda com calendário que destaca dias, lista por mês, filtro por dia; seção 'Próximos eventos' na home; campos de evento no painel; like/compartilhar/comentários nos eventos
+
 ## Backlog
 - P1: Newsletter/WhatsApp de novas matérias; editor de texto rico; agendamento de posts
 - P2: Contagem de visualizações / mais lidas; categorias filtráveis; streaming de vídeo com range

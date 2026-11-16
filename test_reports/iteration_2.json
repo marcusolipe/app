@@ -1,0 +1,36 @@
+{
+  "summary": "Tested Agenda de Eventos end-to-end. Backend: 57 pytest (44 regression + 13 new event tests), 56 pass, 1 minor fail (impossible dates like 2026-13-45 accepted). Frontend: /agenda calendar highlights event days (Nov 19/24, Dec 1/8), clicking day filters list, clear-day resets, day without events shows agenda-empty, month navigation works, month grouping (Novembro/Dezembro de 2026), cards link to /post/{id}; post detail shows event-info (date/time/location) + like/share/comments; Home shows home-upcoming-events with 4 cards + home-see-all-agenda link, events not in hero/side; Admin (Clerk ticket sign-in) evento filter shows 4, selecting Evento type shows admin-event-fields, saving without date shows 'Informe a data do evento' toast, created event appears in admin list and on /agenda (day 27 highlighted). TEST data cleaned up; 4 seeded events intact.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST/PUT /api/admin/posts", "issue": "event_date regex ^(\\d{4}-\\d{2}-\\d{2})?$ only checks format; impossible dates (2026-13-45) return 200 and are stored. Use a field_validator with date.fromisoformat."},
+      {"endpoint": "GET /api/posts?upcoming=true", "issue": "'today' computed in UTC; in Angra (UTC-3) events for today disappear after 21:00 local time. Consider America/Sao_Paulo timezone."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/agenda calendar", "issues": ["Selected day is visually indistinguishable from other event days (hasEvent class uses !bg override, so selected styling is lost) - add ring/outline for selected"]},
+      {"screen": "Admin post form", "issues": ["Uses browser native <input type=date/time> pickers instead of shadcn Calendar/Popover (shows mm/dd/yyyy US format to a pt-BR user)"]},
+      {"screen": "Post detail for evento", "issues": ["Header nav 'Agenda' not active when viewing an event post (minor)"]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_paty_events.py", "/app/backend/tests/test_paty_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Validate event_date is a real calendar date (422 for 2026-13-45)",
+    "Optional: compute upcoming 'today' in America/Sao_Paulo",
+    "Optional: distinct selected-day style on agenda calendar; shadcn date picker in admin form"
+  ],
+  "critical_code_review_comments": [
+    "server.py PostIn.event_date: format-only regex, no semantic date validation; frontend parseDay would render invalid Date for bad values",
+    "list_posts upcoming filter uses UTC date",
+    "Agenda.jsx modifiersClassNames hasEvent with !important overrides selected state styling"
+  ],
+  "updated_files": ["/app/backend/tests/test_paty_events.py"],
+  "success_rate": {"backend": "98% (56/57)", "frontend": "100%"},
+  "seed_data_creation": "None persisted. Created TEST_ events via API/UI and deleted them by id; 4 seeded events remain.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: cd /app/backend/tests && python -m pytest . (pytest.ini uses xdist). test_paty_events.py::test_impossible_date fails until event_date gets real date validation. UI admin sign-in: python clerk_helper.py ticket user_3MCsamENPXa0SiincsaiQTtcRb5 then open /sign-in?__clerk_ticket=<ticket> -> redirects to /admin. Agenda highlighted days selector: '[data-testid=agenda-page] button.\\!bg-\\[\\#FF2A7A\\]'."
+}

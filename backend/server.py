@@ -7,6 +7,7 @@ import os
 import logging
 import uuid
 import re
+from zoneinfo import ZoneInfo
 import requests
 from starlette.concurrency import run_in_threadpool
 from pathlib import Path
@@ -140,6 +141,13 @@ class PostIn(BaseModel):
     event_time: str = ""
     location: str = ""
 
+    @field_validator("event_date")
+    @classmethod
+    def valid_date(cls, v):
+        if v:
+            datetime.strptime(v, "%Y-%m-%d")
+        return v
+
 
 class Post(PostIn):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -184,7 +192,7 @@ async def list_posts(type: Optional[PostType] = None, q: Optional[str] = None, u
     if q:
         query["title"] = {"$regex": re.escape(q), "$options": "i"}
     if upcoming:
-        query["event_date"] = {"$gte": datetime.now(timezone.utc).date().isoformat()}
+        query["event_date"] = {"$gte": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()}
     sort = ("event_date", 1) if type == "evento" else ("created_at", -1)
     docs = await db.posts.find(query, {"_id": 0}).sort(*sort).to_list(limit)
     return [Post(**d) for d in docs]

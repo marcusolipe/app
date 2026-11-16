@@ -35,7 +35,7 @@ export default function Agenda() {
           <div className="lg:sticky lg:top-28 rounded-3xl bg-white border-2 border-[#0B132B] shadow-[6px_6px_0_#FFB800] p-3 flex flex-col items-center">
             <Calendar mode="single" locale={ptBR} selected={day} onSelect={setDay} data-testid="agenda-calendar"
               modifiers={{ hasEvent: eventDays }}
-              modifiersClassNames={{ hasEvent: "!bg-[#FF2A7A] !text-white font-bold rounded-full" }} />
+              modifiersClassNames={{ hasEvent: "!bg-[#FF2A7A] !text-white font-bold rounded-full", selected: "ring-4 ring-[#FFB800] ring-offset-2" }} />
             <p className="text-xs text-[#0B132B]/60 flex items-center gap-2 pb-2">
               <span className="w-3 h-3 rounded-full bg-[#FF2A7A]" /> Dias com evento
             </p>
