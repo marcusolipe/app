@@ -1,0 +1,50 @@
+{
+  "summary": "First full run of PATY INVESTIGA. Backend: 44 pytest cases (public posts/filter/search/like/comments, auth gates 401/403, admin CRUD, comments admin, upload+file fetch, users/roles incl. last-admin 409). 41 passed, 3 failed (2 real 500s + missing validation). Frontend (Playwright, 1920 and 375px): home hero/sections/reels tray, nav to all sections, section search, post detail like/unlike (persists via localStorage), share popover (WhatsApp href, copy link toast), comments (validation toast, post, persists, name remembered), not-found page, reels next/prev snap, reel like, comments drawer, share; admin redirect to /sign-in when signed out, ticket sign-in -> admin-dashboard, create post with type select + real image upload, edit, filter, delete, comments tab delete, users tab, member sees admin-no-access, mobile menu. Everything worked except the search crash on regex special characters.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "GET /api/posts?q=(", "issue": "Returns 500 (pymongo OperationFailure 'Regular expression is invalid'). User input goes straight into $regex. Typing '(' , '[', '*' or '+' in the section search box crashes it. Fix: query['title'] = {'$regex': re.escape(q), '$options': 'i'}", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/posts/{id}/comments", "issue": "A whitespace-only name or content (e.g. '   ') passes CommentIn min_length. After strip(), building Comment(...) raises a pydantic ValidationError, which comes back as an unhandled 500 instead of 422. Fix: strip in a field_validator (or use constr(strip_whitespace=True, min_length=1)) on CommentIn."},
+      {"endpoint": "POST/PUT /api/admin/posts", "issue": "An empty title is accepted (200). The UI blocks it, but the API does not. Add Field(min_length=1) on title."},
+      {"endpoint": "GET /api/posts", "issue": "The limit parameter has no upper bound (a client can send limit=100000)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "SectionPage search", "issue": "Typing '(' in section-search-input shows the Emergent 'Unhandled rejection: Request failed with status code 500' overlay, which blocks the whole page. Two causes: the backend 500 and the missing .catch on the search request.", "selector": "[data-testid='section-search-input']", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Error handling", "issue": "Several API calls have no catch, so any backend or network error becomes an unhandled-rejection overlay: SectionPage search fetch, LikeButton.toggle (also no optimistic rollback), Comments GET, Admin PostsAdmin load/remove, Reels GET.", "affected_selectors": ["like-button-post-*", "admin-delete-post-*", "section-search-input"]}
+    ],
+    "design_issues": [
+      {"screen": "Home desktop", "issues": ["The hero card on the left is much shorter than the two stacked cards on the right, which leaves a large empty block under the hero."]},
+      {"screen": "Reels", "issues": ["The title gradient and the action buttons overlap YouTube's own controls ('Watch on YouTube', the channel header) inside the iframe. The white icons are hard to see over bright video frames."]},
+      {"screen": "Admin Users tab", "issues": ["The role picker is a native <select>, while the post form uses the shadcn Select. This is inconsistent."]},
+      {"screen": "Admin no-access", "issues": ["No sign-out or back-home button. A member, or a user whose /me failed (the role:'error' fallback), is stuck with only the Clerk UserButton."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_paty_api.py", "/app/backend/tests/clerk_helper.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Escape the search regex: re.escape(q) in list_posts",
+    "Make CommentIn reject whitespace-only name/content with 422 (strip before validating)",
+    "Add min_length=1 to PostIn.title and cap limit (e.g. le=100)",
+    "Add .catch/try-catch with toast on the SectionPage search, LikeButton (roll back state on failure), Comments load, Admin load/delete and Reels load",
+    "Optional: add a sign-out/home link on the admin-no-access screen"
+  ],
+  "critical_code_review_comments": [
+    "server.py current_member calls the synchronous requests-based _clerk_user inside an async dependency, and /files and /admin/upload call the sync put_object/get_object. These block the event loop; wrap them in run_in_threadpool/asyncio.to_thread.",
+    "upload reads the whole file (up to 200MB) into memory before the size check. Consider streaming, or checking the size early.",
+    "Uploaded files are never cleaned up (there is no delete path or soft-delete), so orphan TEST uploads stay in storage.",
+    "Likes are anonymous with no per-client dedupe (localStorage only), so the counter can be inflated by calling the API directly. Acceptable for an MVP, but worth noting.",
+    "list_comments does not check that the post exists or is published, so comments on unpublished posts can be read by id."
+  ],
+  "updated_files": ["/app/backend/tests/test_paty_api.py", "/app/backend/tests/clerk_helper.py", "/app/memory/test_credentials.md"],
+  "success_rate": {"backend": "93% (41/44)", "frontend": "95% (all flows pass except the special-character search crash)"},
+  "test_credentials": "test_credentials.md was empty. It now lists admin+clerk_test@example.com (admin) and leitor+clerk_test@example.com (member), which already existed in Clerk and the db. Tokens and tickets come from clerk_helper.py.",
+  "seed_data_creation": "Temporary TEST_ posts, comments and uploads were created; all TEST_ posts and comments were deleted by id afterwards. Seeded data is unchanged (9 posts, 0 likes). Two 1x1 TEST png uploads remain in object storage and db.files (there is no delete API).",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: cd /app/backend/tests && python -m pytest test_paty_api.py. Use clerk_helper.py ticket <user_id> for UI sign-in (tickets are single use). Expected failures until fixed: test_search_regex_special_chars, test_comment_whitespace_only_rejected, test_create_empty_title_rejected. The Clerk ticket sign-in redirects straight to /admin.",
+  "rca of the issue": "Search crash: list_posts passes raw q into Mongo $regex, and an unbalanced '(' gives OperationFailure 51091, which becomes a 500. The frontend search effect has no catch, so the Emergent overlay blocks the page. Repro: open /noticias and type '('. Fix: re.escape plus a catch in the frontend."
+}

@@ -21,7 +21,7 @@ export default function ShareButton({ post, vertical = false }) {
       <PopoverTrigger asChild>
         {vertical ? (
           <button data-testid={`share-button-post-${post.id}`} className="flex flex-col items-center gap-1 text-white">
-            <span className="w-12 h-12 rounded-full grid place-items-center bg-white/20 backdrop-blur-md"><Share2 className="w-6 h-6" /></span>
+            <span className="w-12 h-12 rounded-full grid place-items-center bg-black/45 backdrop-blur-md shadow-lg"><Share2 className="w-6 h-6" /></span>
             <span className="text-xs font-bold">Enviar</span>
           </button>
         ) : (

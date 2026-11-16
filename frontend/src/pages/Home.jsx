@@ -83,7 +83,7 @@ export default function Home() {
 
       {hero && (
         <div className="grid gap-7 lg:grid-cols-12">
-          <div className="lg:col-span-8"><Hero post={hero} /></div>
+          <div className="lg:col-span-8 [&>a]:h-full"><Hero post={hero} /></div>
           <div className="lg:col-span-4 grid gap-7">
             {side.map((p, i) => <PostCard key={p.id} post={p} index={i + 1} />)}
           </div>

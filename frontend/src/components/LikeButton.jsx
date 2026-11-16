@@ -19,8 +19,14 @@ export default function LikeButton({ post, vertical = false }) {
     setTimeout(() => setAnim(false), 400);
     const list = getLiked().filter((id) => id !== post.id);
     localStorage.setItem(KEY, JSON.stringify(next ? [...list, post.id] : list));
-    const { data } = await http.post(`/posts/${post.id}/like`, null, { params: { unlike: !next } });
-    setLikes(data.likes);
+    try {
+      const { data } = await http.post(`/posts/${post.id}/like`, null, { params: { unlike: !next } });
+      setLikes(data.likes);
+    } catch {
+      setLiked(!next);
+      setLikes((n) => n + (next ? -1 : 1));
+      localStorage.setItem(KEY, JSON.stringify(next ? list : [...list, post.id]));
+    }
   };
 
   if (vertical) {

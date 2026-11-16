@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, UploadFile, File, Response
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, UploadFile, File, Response, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,11 @@ from pymongo import ReturnDocument
 import os
 import logging
 import uuid
+import re
 import requests
+from starlette.concurrency import run_in_threadpool
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 from datetime import datetime, timezone
 
@@ -60,7 +62,7 @@ async def current_member(user: dict = Depends(require_user)) -> dict:
     uid = user["user_id"]
     member = await db.users.find_one({"user_id": uid}, {"_id": 0})
     if member is None or not member.get("role"):
-        info = _clerk_user(uid)
+        info = await run_in_threadpool(_clerk_user, uid)
         role = "admin" if _is_admin_email(info) else DEFAULT_ROLE
         email = (info.get("email_addresses") or [{}])[0].get("email_address", "")
         await db.users.update_one({"user_id": uid, "role": {"$in": [None, ""]}}, {"$set": {"role": role}})
@@ -125,7 +127,7 @@ def now_iso():
 
 class PostIn(BaseModel):
     type: PostType
-    title: str
+    title: str = Field(min_length=1, max_length=300)
     summary: str = ""
     content: str = ""
     category: str = ""
@@ -148,6 +150,11 @@ class CommentIn(BaseModel):
     name: str = Field(min_length=1, max_length=60)
     content: str = Field(min_length=1, max_length=1500)
 
+    @field_validator("name", "content", mode="before")
+    @classmethod
+    def strip_text(cls, v):
+        return v.strip() if isinstance(v, str) else v
+
 
 class Comment(CommentIn):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -166,12 +173,12 @@ async def root():
 
 
 @api_router.get("/posts", response_model=List[Post])
-async def list_posts(type: Optional[PostType] = None, q: Optional[str] = None, limit: int = 50):
+async def list_posts(type: Optional[PostType] = None, q: Optional[str] = None, limit: int = Query(50, ge=1, le=200)):
     query = {"published": True}
     if type:
         query["type"] = type
     if q:
-        query["title"] = {"$regex": q, "$options": "i"}
+        query["title"] = {"$regex": re.escape(q), "$options": "i"}
     docs = await db.posts.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
     return [Post(**d) for d in docs]
 
@@ -197,6 +204,8 @@ async def like_post(post_id: str, unlike: bool = False):
 
 @api_router.get("/posts/{post_id}/comments", response_model=List[Comment])
 async def list_comments(post_id: str):
+    if not await db.posts.find_one({"id": post_id, "published": True}, {"_id": 1}):
+        raise HTTPException(404, "Postagem não encontrada")
     docs = await db.comments.find({"post_id": post_id}, {"_id": 0}).sort("created_at", -1).to_list(500)
     return [Comment(**d) for d in docs]
 
@@ -216,7 +225,7 @@ async def download(path: str):
     record = await db.files.find_one({"storage_path": path, "is_deleted": False}, {"_id": 0})
     if not record:
         raise HTTPException(404, "Arquivo não encontrado")
-    data, ct = get_object(path)
+    data, ct = await run_in_threadpool(get_object, path)
     return Response(content=data, media_type=record.get("content_type") or ct,
                     headers={"Cache-Control": "public, max-age=86400", "Accept-Ranges": "none"})
 
@@ -287,7 +296,7 @@ async def upload(file: UploadFile = File(...), member: dict = Depends(is_admin))
         raise HTTPException(400, "Arquivo muito grande (máx. 200MB)")
     ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else "bin"
     path = f"{APP_NAME}/uploads/{uuid.uuid4()}.{ext}"
-    result = put_object(path, data, ct)
+    result = await run_in_threadpool(put_object, path, data, ct)
     await db.files.insert_one({"id": str(uuid.uuid4()), "storage_path": result["path"], "original_filename": file.filename,
                                "content_type": ct, "size": result.get("size", len(data)), "is_deleted": False,
                                "uploaded_by": member["user_id"], "created_at": now_iso()})

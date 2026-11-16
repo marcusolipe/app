@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { Show, useAuth } from "@clerk/react";
+import { Navigate, Link } from "react-router-dom";
+import { Show, SignOutButton, useAuth } from "@clerk/react";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,13 +20,17 @@ const PostsAdmin = () => {
   const [filter, setFilter] = useState("all");
   const [editing, setEditing] = useState(null);
 
-  const load = useCallback(async () => setPosts((await http.get("/admin/posts", await auth())).data), [auth]);
+  const load = useCallback(async () => {
+    try { setPosts((await http.get("/admin/posts", await auth())).data); } catch { toast.error("Erro ao carregar postagens"); }
+  }, [auth]);
   useEffect(() => { load(); }, [load]);
 
   const remove = async (p) => {
     if (!window.confirm(`Excluir "${p.title}"?`)) return;
-    await http.delete(`/admin/posts/${p.id}`, await auth());
-    toast.success("Postagem excluída");
+    try {
+      await http.delete(`/admin/posts/${p.id}`, await auth());
+      toast.success("Postagem excluída");
+    } catch { toast.error("Erro ao excluir"); }
     load();
   };
 
@@ -77,6 +81,10 @@ const Dashboard = () => {
       <div className="max-w-lg mx-auto text-center py-24 px-6" data-testid="admin-no-access">
         <h1 className="font-display font-black text-4xl">Acesso restrito</h1>
         <p className="mt-4 text-[#0B132B]/70">Esta área é exclusiva da administração do portal. Se você é a administradora, entre com o e-mail cadastrado como admin.</p>
+        <div className="mt-8 flex justify-center gap-3">
+          <Link to="/" data-testid="admin-no-access-home" className="rounded-full bg-[#FFB800] px-5 py-2.5 font-bold">Voltar ao início</Link>
+          <SignOutButton><button data-testid="admin-no-access-signout" className="rounded-full border-2 border-[#0B132B] px-5 py-2.5 font-bold">Sair</button></SignOutButton>
+        </div>
       </div>
     );
   }

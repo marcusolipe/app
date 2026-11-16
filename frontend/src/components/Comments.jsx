@@ -12,7 +12,7 @@ export default function Comments({ postId, onAdded, compact = false }) {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    http.get(`/posts/${postId}/comments`).then((r) => setList(r.data));
+    http.get(`/posts/${postId}/comments`).then((r) => setList(r.data)).catch(() => setList([]));
   }, [postId]);
 
   const submit = async (e) => {

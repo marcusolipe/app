@@ -23,7 +23,7 @@ const ReelItem = ({ reel, onComments }) => (
       <div className="absolute right-3 bottom-24 flex flex-col gap-4">
         <LikeButton post={reel} vertical />
         <button onClick={() => onComments(reel)} data-testid={`reel-comments-button-${reel.id}`} className="flex flex-col items-center gap-1 text-white">
-          <span className="w-12 h-12 rounded-full grid place-items-center bg-white/20 backdrop-blur-md"><MessageCircle className="w-6 h-6" /></span>
+          <span className="w-12 h-12 rounded-full grid place-items-center bg-black/45 backdrop-blur-md shadow-lg"><MessageCircle className="w-6 h-6" /></span>
           <span className="text-xs font-bold">{reel.comments_count}</span>
         </button>
         <ShareButton post={reel} vertical />
@@ -38,7 +38,7 @@ export default function Reels() {
   const [params] = useSearchParams();
   const box = useRef(null);
 
-  useEffect(() => { http.get("/posts", { params: { type: "reel" } }).then((r) => setReels(r.data)); }, []);
+  useEffect(() => { http.get("/posts", { params: { type: "reel" } }).then((r) => setReels(r.data)).catch(() => setReels([])); }, []);
   useEffect(() => {
     const id = params.get("r");
     if (reels && id) document.getElementById(`reel-${id}`)?.scrollIntoView();

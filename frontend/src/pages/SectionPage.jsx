@@ -17,7 +17,7 @@ export default function SectionPage({ type }) {
 
   useEffect(() => {
     setPosts(null);
-    const id = setTimeout(() => http.get("/posts", { params: { type, q: q || undefined } }).then((r) => setPosts(r.data)), 250);
+    const id = setTimeout(() => http.get("/posts", { params: { type, q: q || undefined } }).then((r) => setPosts(r.data)).catch(() => setPosts([])), 250);
     return () => clearTimeout(id);
   }, [type, q]);
 
